@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intake — LB AI Solutions</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+:root{
+  --bg:#05060f;--bg2:#09101f;--card:#0c1220;--border:#1a2540;
+  --p:#7c3aed;--p2:#9333ea;--a:#06b6d4;--a2:#0891b2;
+  --t:#f1f5f9;--m:#6b7fa3;--ok:#10b981;--err:#f43f5e;
+  --r1:#7c3aed22;--r2:#06b6d422;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);min-height:100vh;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -20%,#7c3aed18,transparent),
+  radial-gradient(ellipse 60% 40% at 80% 100%,#06b6d410,transparent)}
+.wrap{max-width:900px;margin:0 auto;padding:36px 20px 80px}
+
+/* HEADER */
+header{text-align:center;padding:48px 0 40px}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--border);border-radius:999px;padding:6px 16px;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:var(--a);text-transform:uppercase;margin-bottom:20px}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 6px var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+h1{font-size:clamp(26px,5vw,42px);font-weight:800;letter-spacing:-1px;line-height:1.15;margin-bottom:10px}
+h1 span{background:linear-gradient(120deg,var(--p),var(--a));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sub{color:var(--m);font-size:16px;max-width:520px;margin:0 auto}
+
+/* STEPS */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin:36px 0 32px}
+.st{display:flex;align-items:center;gap:10px}
+.st-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:14px;border:2px solid var(--border);color:var(--m);
+  font-family:'Space Mono',monospace;transition:.3s;flex-shrink:0}
+.st-label{font-size:13px;font-weight:600;color:var(--m);transition:.3s;white-space:nowrap}
+.st-line{width:40px;height:1px;background:var(--border);margin:0 6px;flex-shrink:0}
+.st.active .st-num{border-color:var(--p);background:var(--p);color:#fff;box-shadow:0 0 16px var(--r1)}
+.st.active .st-label{color:var(--t)}
+.st.done .st-num{border-color:var(--ok);background:var(--ok);color:#fff}
+.st.done .st-label{color:var(--ok)}
+@media(max-width:500px){.st-label{display:none}.st-line{width:24px}}
+
+/* VERTICAL SELECTION */
+.v-label{text-align:center;font-family:'Space Mono',monospace;font-size:11px;
+  letter-spacing:2px;color:var(--a);text-transform:uppercase;margin-bottom:24px}
+.v-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:14px}
+.v-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;
+  padding:28px 16px 22px;text-align:center;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.v-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--r1),transparent);
+  opacity:0;transition:.3s}
+.v-card:hover{border-color:var(--p);transform:translateY(-3px);box-shadow:0 8px 32px var(--r1)}
+.v-card:hover::before{opacity:1}
+.v-icon{font-size:38px;margin-bottom:12px;display:block}
+.v-name{font-weight:800;font-size:14px;margin-bottom:4px;line-height:1.3}
+.v-sub{color:var(--m);font-size:12px}
+
+/* FORM CARD */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:36px;margin-top:4px}
+.form-title{font-size:20px;font-weight:800;margin-bottom:4px;letter-spacing:-.5px}
+.form-subtitle{color:var(--a);font-family:'Space Mono',monospace;font-size:11px;
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:32px}
+.f-section{margin-bottom:36px}
+.f-section-head{display:flex;align-items:center;gap:10px;
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--a);border-bottom:1px solid var(--border);
+  padding-bottom:12px;margin-bottom:22px}
+.f-section-num{background:var(--r2);border:1px solid var(--a)55;border-radius:6px;
+  padding:2px 8px;font-size:11px;color:var(--a)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:14px;font-weight:600;color:#cbd5e1;margin-bottom:7px}
+.req{color:var(--p);font-size:13px;margin-left:2px}
+.hint{font-size:12px;color:var(--m);margin-top:5px;line-height:1.5}
+input,textarea,select{
+  width:100%;background:#06080f;border:1.5px solid var(--border);
+  border-radius:12px;color:var(--t);padding:13px 16px;
+  font-size:15px;font-family:'DM Sans',sans-serif;transition:.2s;
+  appearance:none;-webkit-appearance:none;resize:vertical}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 3px var(--r1)}
+input::placeholder,textarea::placeholder{color:var(--m)}
+select option{background:#09101f}
+.select-wrap{position:relative}
+.select-wrap::after{content:'▾';position:absolute;right:16px;top:50%;transform:translateY(-50%);
+  color:var(--m);pointer-events:none;font-size:14px}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.btn{padding:14px 26px;border-radius:14px;font-weight:700;font-size:15px;
+  cursor:pointer;border:none;transition:.2s;font-family:'DM Sans',sans-serif;letter-spacing:-.2px}
+.btn-p{background:linear-gradient(135deg,var(--p),var(--p2));color:#fff;box-shadow:0 4px 20px var(--r1)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 28px var(--r1)}
+.btn-g{background:transparent;border:1.5px solid var(--border);color:var(--m)}
+.btn-g:hover{border-color:var(--p);color:var(--t)}
+@media(max-width:520px){.btn{width:100%}}
+
+/* SUMMARY */
+.sum-header{display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.sum-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:var(--a);text-transform:uppercase}
+.sum-box{background:#02040a;border:1.5px solid var(--p)44;border-radius:16px;
+  padding:24px;font-family:'Space Mono',monospace;font-size:12px;line-height:1.9;
+  color:#a5b4fc;white-space:pre-wrap;max-height:420px;overflow-y:auto;
+  word-break:break-word}
+.sum-box::-webkit-scrollbar{width:5px}
+.sum-box::-webkit-scrollbar-track{background:transparent}
+.sum-box::-webkit-scrollbar-thumb{background:var(--p)55;border-radius:99px}
+.copy-ok{color:var(--ok);font-size:13px;font-weight:700;margin-top:10px;display:none;
+  font-family:'Space Mono',monospace}
+
+/* UTIL */
+.hidden{display:none}
+.mt-8{margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-badge"><span class="logo-dot"></span>LB AI Solutions</div>
+    <h1>Formulário de <span>Intake</span></h1>
+    <p class="sub">Preencha para iniciar a criação do seu app de estudos personalizado. Cada campo alimenta o protocolo de aprendizagem do Método Liza Becker.</p>
+  </header>
+
+  <!-- STEPS -->
+  <div class="steps">
+    <div class="st active" id="s1"><div class="st-num">01</div><div class="st-label">Perfil</div></div>
+    <div class="st-line"></div>
+    <div class="st" id="s2"><div class="st-num">02</div><div class="st-label">Dados</div></div>
+    <div class="st-line"></div>
+    <div class="st" id="s3"><div class="st-num">03</div><div class="st-label">Resumo</div></div>
+  </div>
+
+  <!-- STEP 1: SELECT VERTICAL -->
+  <div id="step1">
+    <p class="v-label">Selecione o perfil do estudante</p>
+    <div class="v-grid">
+      <div class="v-card" onclick="selectV('f1')">
+        <span class="v-icon">🧒</span>
+        <div class="v-name">Ensino Fund. I</div>
+        <div class="v-sub">6 a 10 anos</div>
+      </div>
+      <div class="v-card" onclick="selectV('f2')">
+        <span class="v-icon">🧑‍🎒</span>
+        <div class="v-name">Fund. II / Médio</div>
+        <div class="v-sub">11 a 17 anos</div>
+      </div>
+      <div class="v-card" onclick="selectV('vest')">
+        <span class="v-icon">🏆</span>
+        <div class="v-name">Vestibular / Concurso</div>
+        <div class="v-sub">Provas seletivas</div>
+      </div>
+      <div class="v-card" onclick="selectV('uni')">
+        <span class="v-icon">🎓</span>
+        <div class="v-name">Universitário / Pós</div>
+        <div class="v-sub">Ensino superior</div>
+      </div>
+      <div class="v-card" onclick="selectV('corp')">
+        <span class="v-icon">🏢</span>
+        <div class="v-name">Corporativo</div>
+        <div class="v-sub">T&D / POPs / Compliance</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: FORM -->
+  <div id="step2" class="hidden">
+    <div class="form-card">
+      <div class="form-title" id="formTitle"></div>
+      <div class="form-subtitle" id="formSubtitle"></div>
+      <div id="formContent"></div>
+      <div class="btn-row">
+        <button class="btn btn-p" onclick="generateSummary()">Gerar resumo →</button>
+        <button class="btn btn-g" onclick="goBack()">← Voltar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: SUMMARY -->
+  <div id="step3" class="hidden">
+    <div class="form-card">
+      <div class="sum-header">
+        <div>
+          <div class="form-title">Resumo gerado</div>
+          <div class="form-subtitle">Copie e envie para Liza Becker junto ao conteúdo programático</div>
+        </div>
+      </div>
+      <div class="sum-box" id="sumBox"></div>
+      <div class="copy-ok" id="copyOk">✅ Copiado para a área de transferência!</div>
+      <div class="btn-row mt-8">
+        <button class="btn btn-p" onclick="copyAll()">📋 Copiar tudo</button>
+        <button class="btn btn-g" onclick="startOver()">Novo intake</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+const V = {
+  f1:{
+    title:"Ensino Fundamental I",
+    sub:"Perfil · 6 a 10 anos",
+    sections:[
+      {n:"01", title:"Identificação do aluno", fields:[
+        {id:"nome",        label:"Nome da criança",          type:"text",     req:true},
+        {id:"idade",       label:"Idade",                    type:"number",   req:true, hint:"Ex: 9"},
+        {id:"ano",         label:"Ano escolar",              type:"select",   req:true,
+          opts:["1º ano","2º ano","3º ano","4º ano","5º ano"]},
+        {id:"escola",      label:"Nome da escola",           type:"text",     req:false}
+      ]},
+      {n:"02", title:"Avaliação", fields:[
+        {id:"tipo_aval",   label:"Tipo de avaliação",        type:"select",   req:true,
+          opts:["Prova escolar regular","Olimpíada","Avaliação diagnóstica","Competição","Outro"]},
+        {id:"tipo_outro",  label:"Se 'Outro', descreva",     type:"text",     req:false},
+        {id:"data_prova",  label:"Data da avaliação (ou previsão)", type:"text", req:true, hint:"Ex: 15/08/2025"},
+        {id:"disciplinas", label:"Disciplinas e temas que serão avaliados", type:"textarea", req:true,
+          hint:"Liste todos os conteúdos que podem cair na prova"}
+      ]},
+      {n:"03", title:"Conteúdo programático", fields:[
+        {id:"tem_conteudo",label:"Você tem o conteúdo programático?", type:"select", req:true,
+          opts:["Sim — vou enviar junto a este intake","Não tenho — preciso que Liza pesquise"]},
+        {id:"tem_material",label:"Há material de estudo já existente?", type:"select", req:true,
+          opts:["Sim (apostila, caderno, livro, slides)","Não"]}
+      ]},
+      {n:"04", title:"Perfil de aprendizagem", fields:[
+        {id:"dificuldade", label:"A criança tem dificuldade específica diagnosticada?", type:"select", req:false,
+          opts:["Não","Sim — TDAH","Sim — Dislexia","Sim — TEA","Sim — Outro"]},
+        {id:"dif_det",     label:"Se sim, detalhe",          type:"text",     req:false},
+        {id:"tema_fav",    label:"Tema / universo favorito da criança", type:"text", req:false,
+          hint:"Ex: espaço, dinossauros, super-heróis — usado para personalizar o visual do app"},
+        {id:"horas",       label:"Horas por semana disponíveis para estudar", type:"select", req:true,
+          opts:["Menos de 1h","1h a 2h","2h a 4h","Mais de 4h"]}
+      ]},
+      {n:"05", title:"Contato do responsável", fields:[
+        {id:"resp_nome",   label:"Nome do responsável",      type:"text",     req:true},
+        {id:"resp_email",  label:"E-mail",                   type:"email",    req:true},
+        {id:"resp_whats",  label:"WhatsApp (com DDD)",       type:"tel",      req:true},
+        {id:"obs",         label:"Observações adicionais",   type:"textarea", req:false}
+      ]}
+    ]
+  },
+  f2:{
+    title:"Ensino Fundamental II / Ensino Médio",
+    sub:"Perfil · 11 a 17 anos",
+    sections:[
+      {n:"01", title:"Identificação do aluno", fields:[
+        {id:"nome",        label:"Nome do aluno",            type:"text",   req:true},
+        {id:"idade",       label:"Idade",                    type:"number", req:true},
+        {id:"ano",         label:"Ano / série",              type:"select", req:true,
+          opts:["6º ano EF","7º ano EF","8º ano EF","9º ano EF","1º ano EM","2º ano EM","3º ano EM"]},
+        {id:"escola",      label:"Nome da escola",           type:"text",   req:false}
+      ]},
+      {n:"02", title:"Avaliação", fields:[
+        {id:"tipo_aval",   label:"Tipo de avaliação",        type:"select", req:true,
+          opts:["Prova escolar regular","ENEM","Vestibulinho","Olimpíada","SAEB","Simulado","Outro"]},
+        {id:"tipo_outro",  label:"Se 'Outro', descreva",     type:"text",   req:false},
+        {id:"data_prova",  label:"Data da avaliação",        type:"text",   req:true},
+        {id:"disciplinas", label:"Disciplinas e conteúdos cobrados", type:"textarea", req:true},
+        {id:"formato_q",   label:"Formato das questões",     type:"select", req:true,
+          opts:["Múltipla escolha (4 alternativas)","Múltipla escolha (5 alternativas)","Discursiva","Mista"]}
+      ]},
+      {n:"03", title:"Conteúdo programático", fields:[
+        {id:"tem_conteudo",label:"Conteúdo programático disponível?", type:"select", req:true,
+          opts:["Sim — vou enviar","Não tenho"]},
+        {id:"tem_material",label:"Há material de estudo existente?",  type:"select", req:true,
+          opts:["Sim","Não"]}
+      ]},
+      {n:"04", title:"Perfil de aprendizagem", fields:[
+        {id:"dificuldades",label:"Maiores dificuldades por disciplina", type:"textarea", req:false,
+          hint:"Ex: Em Matemática não entendo funções. Em História, datas são difíceis."},
+        {id:"horas",       label:"Horas semanais disponíveis para estudo", type:"select", req:true,
+          opts:["Menos de 2h","2h a 5h","5h a 10h","Mais de 10h"]},
+        {id:"estilo",      label:"Como prefere estudar?",    type:"select", req:false,
+          opts:["Lendo textos","Respondendo questões logo","Visual (mapas e esquemas)","Mistura tudo"]}
+      ]},
+      {n:"05", title:"Contato", fields:[
+        {id:"resp_nome",   label:"Nome do responsável (se menor) ou do próprio aluno", type:"text", req:true},
+        {id:"email",       label:"E-mail",                   type:"email", req:true},
+        {id:"whats",       label:"WhatsApp (com DDD)",       type:"tel",   req:true},
+        {id:"obs",         label:"Observações adicionais",   type:"textarea", req:false}
+      ]}
+    ]
+  },
+  vest:{
+    title:"Vestibular / Concurso Público",
+    sub:"Perfil · Provas seletivas",
+    sections:[
+      {n:"01", title:"Identificação do candidato", fields:[
+        {id:"nome",        label:"Nome completo",            type:"text",   req:true},
+        {id:"idade",       label:"Idade",                    type:"number", req:false},
+        {id:"escol",       label:"Nível de escolaridade atual", type:"select", req:true,
+          opts:["Ensino médio incompleto","Ensino médio completo","Superior incompleto","Superior completo","Pós-graduação"]}
+      ]},
+      {n:"02", title:"Avaliação", fields:[
+        {id:"tipo",        label:"Tipo de seleção",          type:"select", req:true,
+          opts:["Vestibular","Concurso público federal","Concurso público estadual","Concurso público municipal","Certificação profissional","Outro"]},
+        {id:"cargo",       label:"Cargo (concurso) ou Curso / IES (vestibular)", type:"text", req:true},
+        {id:"orgao",       label:"Órgão ou instituição",    type:"text",   req:true},
+        {id:"banca",       label:"Banca examinadora",       type:"text",   req:false,
+          hint:"Ex: CESPE/CEBRASPE, FCC, Vunesp, FGV, IBFC, Banca própria"},
+        {id:"data_prova",  label:"Data da prova",           type:"text",   req:true},
+        {id:"formato_q",   label:"Formato das questões",    type:"select", req:true,
+          opts:["Múltipla escolha","CESPE — certo ou errado","Discursiva","Mista"]}
+      ]},
+      {n:"03", title:"Conteúdo programático", fields:[
+        {id:"tem_edital",  label:"Tem o edital?",            type:"select", req:true,
+          opts:["Sim — vou enviar junto ao intake","Não tenho"]},
+        {id:"disciplinas", label:"Disciplinas e pesos (se souber)", type:"textarea", req:false,
+          hint:"Ex: Língua Portuguesa (25pts), Raciocínio Lógico (15pts)"}
+      ]},
+      {n:"04", title:"Perfil do candidato", fields:[
+        {id:"tentativas",  label:"Já prestou essa prova antes?", type:"select", req:true,
+          opts:["Não, é a primeira vez","Sim — 1 vez","Sim — 2 vezes","Sim — 3 ou mais vezes"]},
+        {id:"lacuna",      label:"Maior lacuna de conhecimento atual", type:"textarea", req:false},
+        {id:"horas",       label:"Horas semanais disponíveis para estudo", type:"select", req:true,
+          opts:["Menos de 5h","5h a 10h","10h a 20h","20h a 30h","Mais de 30h"]},
+        {id:"trabalhando", label:"Está trabalhando enquanto estuda?", type:"select", req:false,
+          opts:["Sim — regime integral","Sim — meio período","Não"]}
+      ]},
+      {n:"05", title:"Contato", fields:[
+        {id:"email",       label:"E-mail",                  type:"email",    req:true},
+        {id:"whats",       label:"WhatsApp (com DDD)",      type:"tel",      req:true},
+        {id:"obs",         label:"Observações adicionais",  type:"textarea", req:false}
+      ]}
+    ]
+  },
+  uni:{
+    title:"Universitário / Pós-graduação",
+    sub:"Perfil · Ensino superior",
+    sections:[
+      {n:"01", title:"Identificação", fields:[
+        {id:"nome",        label:"Nome completo",            type:"text",   req:true},
+        {id:"curso",       label:"Curso",                   type:"text",   req:true},
+        {id:"periodo",     label:"Período / semestre",      type:"text",   req:true, hint:"Ex: 3º período"},
+        {id:"ies",         label:"Instituição de ensino",   type:"text",   req:true}
+      ]},
+      {n:"02", title:"Avaliação", fields:[
+        {id:"tipo",        label:"Tipo de avaliação",       type:"select", req:true,
+          opts:["Prova regular (P1/P2)","Prova final / recuperação","Seleção de pós-graduação","ENADE","Residência médica / multiprofissional","TCC / Defesa","Outro"]},
+        {id:"disciplinas", label:"Disciplina(s) específicas", type:"textarea", req:true},
+        {id:"data_aval",   label:"Data da avaliação",       type:"text",   req:true},
+        {id:"dominio",     label:"Seu nível de domínio atual do conteúdo", type:"select", req:true,
+          opts:["Básico — zero base","Intermediário — conheço o básico","Avançado — preciso revisar e fixar"]},
+        {id:"formato_q",   label:"Formato da avaliação",    type:"select", req:true,
+          opts:["Múltipla escolha","Discursiva","Prática / laboratório","Oral","Mista"]}
+      ]},
+      {n:"03", title:"Conteúdo e foco", fields:[
+        {id:"tem_ementa",  label:"Ementa ou programa disponível?", type:"select", req:true,
+          opts:["Sim — vou enviar","Não"]},
+        {id:"biblio",      label:"Referências bibliográficas principais", type:"textarea", req:false},
+        {id:"foco",        label:"Precisa de foco em",      type:"select", req:true,
+          opts:["Teoria","Aplicação prática","Os dois igualmente"]}
+      ]},
+      {n:"04", title:"Contato", fields:[
+        {id:"email",       label:"E-mail",                  type:"email",    req:true},
+        {id:"whats",       label:"WhatsApp (com DDD)",      type:"tel",      req:true},
+        {id:"horas",       label:"Horas semanais disponíveis", type:"select", req:true,
+          opts:["Menos de 3h","3h a 7h","7h a 15h","Mais de 15h"]},
+        {id:"obs",         label:"Observações adicionais",  type:"textarea", req:false}
+      ]}
+    ]
+  },
+  corp:{
+    title:"Treinamento Corporativo",
+    sub:"Perfil · T&D / POPs / Compliance",
+    sections:[
+      {n:"01", title:"Dados da empresa", fields:[
+        {id:"empresa",     label:"Nome da empresa",          type:"text",  req:true},
+        {id:"setor",       label:"Setor / segmento",         type:"text",  req:true,
+          hint:"Ex: Saúde, Varejo, Logística, Financeiro, Indústria"},
+        {id:"resp_nome",   label:"Nome do responsável (RH / T&D)", type:"text",  req:true},
+        {id:"email",       label:"E-mail corporativo",       type:"email", req:true},
+        {id:"whats",       label:"WhatsApp / Telefone",      type:"tel",   req:true}
+      ]},
+      {n:"02", title:"Perfil dos colaboradores", fields:[
+        {id:"cargos",      label:"Cargo(s) que receberão o treinamento", type:"textarea", req:true},
+        {id:"n_colab",     label:"Número estimado de colaboradores", type:"number", req:true},
+        {id:"escol_colab", label:"Nível de escolaridade predominante", type:"select", req:true,
+          opts:["Fundamental","Médio","Superior incompleto","Superior completo","Pós-graduação"]},
+        {id:"fam_tec",     label:"Familiaridade dos colaboradores com tecnologia", type:"select", req:true,
+          opts:["Baixa","Média","Alta"]}
+      ]},
+      {n:"03", title:"Conteúdo do treinamento", fields:[
+        {id:"tipo_cont",   label:"Tipo de conteúdo",         type:"select", req:true,
+          opts:["POP — Procedimento Operacional Padrão","Compliance / Ética","Onboarding / Integração","Produto ou serviço","Legislação","Segurança do trabalho","LGPD","Outro"]},
+        {id:"tipo_outro",  label:"Se 'Outro', descreva",     type:"text",   req:false},
+        {id:"objetivo",    label:"Objetivo do treinamento — o que o colaborador deve saber/fazer ao final", type:"textarea", req:true},
+        {id:"material",    label:"Material disponível para base?", type:"select", req:true,
+          opts:["Sim — vou enviar (POPs, manuais, políticas)","Sim, mas precisa atualização","Não temos material estruturado"]},
+        {id:"prazo",       label:"Prazo para entrega do app", type:"text",  req:true,
+          hint:"Ex: até 30/08/2025"}
+      ]},
+      {n:"04", title:"Identidade visual e técnico", fields:[
+        {id:"id_visual",   label:"A empresa tem identidade visual definida?", type:"select", req:true,
+          opts:["Sim — vou enviar logo e manual de marca","Sim — somente o logo","Não, pode usar design padrão LB AI"]},
+        {id:"cores",       label:"Cores principais da marca", type:"text",  req:false,
+          hint:"Ex: #1A3C6E (azul) e #F5A623 (laranja), ou descreva"},
+        {id:"dispositivos",label:"O app será acessado em quais dispositivos?", type:"select", req:true,
+          opts:["Principalmente celular","Principalmente desktop","Tablet","Todos os dispositivos"]},
+        {id:"lms",         label:"A empresa possui LMS (sistema de gestão de aprendizagem)?", type:"select", req:false,
+          opts:["Não","Sim"]},
+        {id:"lms_qual",    label:"Se sim, qual LMS?",         type:"text",  req:false},
+        {id:"relatorio",   label:"Precisa de relatório de progresso?", type:"select", req:true,
+          opts:["Não","Sim — relatório básico (acertos e erros)","Sim — relatório detalhado por colaborador"]}
+      ]},
+      {n:"05", title:"Observações finais", fields:[
+        {id:"obs",         label:"Informações adicionais ou contexto relevante", type:"textarea", req:false}
+      ]}
+    ]
+  }
+};
+
+let curV = null;
+
+function selectV(v){
+  curV = v;
+  const data = V[v];
+  document.getElementById('step1').classList.add('hidden');
+  document.getElementById('step2').classList.remove('hidden');
+  setStep(2);
+  document.getElementById('formTitle').textContent = data.title;
+  document.getElementById('formSubtitle').textContent = data.sub;
+  let html = '';
+  data.sections.forEach(sec=>{
+    html += `<div class="f-section">
+      <div class="f-section-head"><span class="f-section-num">${sec.n}</span>${sec.title}</div>`;
+    sec.fields.forEach(f=>{
+      html += `<div class="field"><label for="${f.id}">${f.label}${f.req?'<span class="req"> *</span>':''}</label>`;
+      if(f.type==='select'){
+        html += `<div class="select-wrap"><select id="${f.id}"><option value="">Selecione...</option>${f.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+      } else if(f.type==='textarea'){
+        html += `<textarea id="${f.id}" rows="3" placeholder="${f.hint||''}"></textarea>`;
+      } else {
+        html += `<input type="${f.type}" id="${f.id}" placeholder="${f.hint||''}">`;
+      }
+      if(f.hint && f.type!=='textarea') html+=`<div class="hint">${f.hint}</div>`;
+      html += '</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('formContent').innerHTML = html;
+  window.scrollTo(0,0);
+}
+
+function generateSummary(){
+  const data = V[curV];
+  const now = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let out = `╔══════════════════════════════════════════════╗
+║        INTAKE — LB AI SOLUTIONS             ║
+╚══════════════════════════════════════════════╝
+
+Vertical   : ${data.title}
+Preenchido : ${now}
+
+`;
+  data.sections.forEach(sec=>{
+    out += `━━━ ${sec.n}. ${sec.title.toUpperCase()} ━━━\n`;
+    sec.fields.forEach(f=>{
+      const el = document.getElementById(f.id);
+      const val = el ? el.value.trim() : '';
+      if(val) out += `${f.label}:\n  ${val}\n`;
+    });
+    out += '\n';
+  });
+  out += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📎 PRÓXIMOS PASSOS
+Envie este resumo + o conteúdo programático
+(edital, apostila, ementa, POPs, manuais)
+diretamente para Liza Becker.
+
+  🌐 lbaisolutions.com
+  📱 (19) 992330187
+  📧 liza.beckerg@gmail.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LB AI Solutions · Liza Becker
+"Todo mundo ensina IA para as mãos.
+ Eu ensino IA para a mente."
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+  document.getElementById('sumBox').textContent = out;
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('step3').classList.remove('hidden');
+  setStep(3);
+  window.scrollTo(0,0);
+}
+
+function copyAll(){
+  const t = document.getElementById('sumBox').textContent;
+  navigator.clipboard.writeText(t).then(()=>{
+    const m = document.getElementById('copyOk');
+    m.style.display='block';
+    setTimeout(()=>m.style.display='none',3000);
+  });
+}
+function goBack(){
+  document.getElementById('step2').classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  setStep(1); window.scrollTo(0,0);
+}
+function startOver(){
+  curV=null;
+  document.getElementById('step3').classList.add('hidden');
+  document.getElementById('step1').classList.remove('hidden');
+  document.getElementById('formContent').innerHTML='';
+  setStep(1); window.scrollTo(0,0);
+}
+function setStep(n){
+  [1,2,3].forEach(i=>{
+    const el = document.getElementById('s'+i);
+    el.className = 'st' + (i<n?' done':(i===n?' active':''));
+  });
+}
+</script>
+</body>
+</html>
